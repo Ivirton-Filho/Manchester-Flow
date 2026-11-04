@@ -14,6 +14,7 @@ export default function App() {
   const [activeItem, setActiveItem] = useState('Painel')
   const [notice, setNotice] = useState('')
   const [patients, setPatients] = useState(demoPatients)
+  const [historyRecords, setHistoryRecords] = useState(demoHistory)
 
   function showNotice(message) {
     setNotice(message)
@@ -29,6 +30,39 @@ export default function App() {
     setPatients(current => current.map(patient => patient.id === id ? { ...patient, status } : patient))
   }
 
+  function completePatient(id) {
+    const patient = patients.find(item => item.id === id)
+    if (!patient) return
+
+    const now = new Date()
+    const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+    const completedAt = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    const vitals = patient.vitals || {}
+
+    setPatients(current => current.map(item => item.id === id ? { ...item, status: 'Concluída' } : item))
+    setHistoryRecords(current => [{
+      id: `h-${Date.now()}`,
+      name: patient.name,
+      initials: patient.initials,
+      reason: patient.reason,
+      priority: patient.priority,
+      date,
+      arrival: patient.time,
+      triageTime: patient.triageTime || patient.time,
+      completedAt,
+      wait: patient.waiting,
+      symptoms: patient.symptoms || patient.reason,
+      vitals: {
+        temperature: vitals.temperature || '—',
+        heartRate: vitals.heartRate || '—',
+        respiratoryRate: vitals.respiratoryRate || '—',
+        bloodPressure: vitals.bloodPressure || '—',
+        oxygen: vitals.oxygen || '—',
+        pain: vitals.pain || '—',
+      },
+    }, ...current])
+  }
+
   function saveTriage(patient) {
     setPatients(current => [patient, ...current])
     setActiveItem('Fila de atendimento')
@@ -40,11 +74,11 @@ export default function App() {
     <div className="main-column">
       <Topbar pageName={activeItem === 'Fila de atendimento' ? 'Fila' : activeItem} onNotice={() => showNotice('Você está em dia. Nenhum aviso novo.')}/>
       {activeItem === 'Fila de atendimento'
-        ? <QueuePage patients={patients} onNavigate={navigate} onUpdatePatient={updatePatientStatus} onNotice={showNotice}/>
+        ? <QueuePage patients={patients} onNavigate={navigate} onUpdatePatient={updatePatientStatus} onCompletePatient={completePatient} onNotice={showNotice}/>
         : activeItem === 'Nova triagem'
           ? <NewTriagePage onNavigate={navigate} onSave={saveTriage}/>
           : activeItem === 'Histórico'
-            ? <HistoryPage records={demoHistory}/>
+            ? <HistoryPage records={historyRecords}/>
             : <DashboardPage onNavigate={navigate} patients={patients}/>}
     </div>
     <MobileNav activeItem={activeItem} onNavigate={navigate} onMore={() => showNotice('Menu de navegação completo nas próximas etapas.')}/>

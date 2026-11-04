@@ -2,12 +2,12 @@ import { useMemo, useState } from 'react'
 import Icon from '../components/Icon.jsx'
 import { demoPatients } from '../data/demoPatients.js'
 
-const distribution = [
-  { name: 'Emergência', level: 'Vermelho', amount: 1, color: 'red' },
-  { name: 'Muito urgente', level: 'Laranja', amount: 2, color: 'orange' },
-  { name: 'Urgente', level: 'Amarelo', amount: 3, color: 'yellow' },
-  { name: 'Pouco urgente', level: 'Verde', amount: 2, color: 'green' },
-  { name: 'Não urgente', level: 'Azul', amount: 1, color: 'blue' },
+const priorityLevels = [
+  { name: 'Emergência', level: 'Vermelho', color: 'red' },
+  { name: 'Muito urgente', level: 'Laranja', color: 'orange' },
+  { name: 'Urgente', level: 'Amarelo', color: 'yellow' },
+  { name: 'Pouco urgente', level: 'Verde', color: 'green' },
+  { name: 'Não urgente', level: 'Azul', color: 'blue' },
 ]
 
 function PriorityBadge({ name }) {
@@ -28,7 +28,16 @@ function MetricCard({ icon, tone, title, value, suffix, trend, caption, children
 export default function DashboardPage({ onNavigate, patients = demoPatients }) {
   const [period, setPeriod] = useState('Hoje')
   const [search, setSearch] = useState('')
-  const filteredPatients = useMemo(() => patients.filter(p => `${p.name} ${p.reason}`.toLowerCase().includes(search.toLowerCase())).slice(0, 5), [search])
+  const activePatients = useMemo(() => patients.filter(patient => ['Aguardando', 'Em atendimento'].includes(patient.status)), [patients])
+  const waitingCount = activePatients.filter(patient => patient.status === 'Aguardando').length
+  const distribution = priorityLevels.map(level => ({ ...level, amount: activePatients.filter(patient => patient.priority === level.level).length }))
+  const filteredPatients = useMemo(() => activePatients.filter(p => `${p.name} ${p.reason}`.toLowerCase().includes(search.toLowerCase())).slice(0, 5), [activePatients, search])
+  let gradientOffset = 0
+  const donutGradient = activePatients.length === 0 ? '#e8eef4' : `conic-gradient(${distribution.map(item => {
+    const start = gradientOffset
+    gradientOffset += item.amount / activePatients.length * 100
+    return `${{ red: '#df655f', orange: '#e99245', yellow: '#efc94b', green: '#66ad78', blue: '#6493bc' }[item.color]} ${start}% ${gradientOffset}%`
+  }).join(', ')})`
 
   return <main className="dashboard">
     <section className="welcome-row">
@@ -37,8 +46,8 @@ export default function DashboardPage({ onNavigate, patients = demoPatients }) {
     </section>
 
     <section className="metric-grid" aria-label="Indicadores operacionais">
-      <MetricCard icon="users" tone="blue" title="EM ATENDIMENTO AGORA" value="09" trend={<span className="trend trend-neutral"><span className="trend-dot"/> fila ativa</span>} caption="pacientes aguardando atendimento">
-        <div className="metric-bottom"><span>Capacidade da unidade</span><div className="capacity"><span style={{width:'45%'}}/></div><b>9 <small>/ 20</small></b></div>
+      <MetricCard icon="users" tone="blue" title="TOTAL NA FILA" value={String(activePatients.length).padStart(2, '0')} trend={<span className="trend trend-neutral"><span className="trend-dot"/> fila ativa</span>} caption={`${waitingCount} aguardando · ${activePatients.length - waitingCount} em atendimento`}>
+        <div className="metric-bottom"><span>Capacidade da unidade</span><div className="capacity"><span style={{width:`${Math.min(activePatients.length / 20 * 100, 100)}%`}}/></div><b>{activePatients.length} <small>/ 20</small></b></div>
       </MetricCard>
       <MetricCard icon="clock" tone="amber" title="TEMPO MÉDIO DE ESPERA" value="24" suffix="min" trend={<span className="trend trend-good">↓ 12% <small>vs. ontem</small></span>} caption="da chegada até o atendimento">
         <div className="metric-sparkline">{[35,48,40,63,49,70,56,82,65,90,70,58].map((height, i) => <span key={i} className={i === 11 ? 'spark-accent' : ''} style={{height:`${height}%`}}/>)}</div>
@@ -54,7 +63,7 @@ export default function DashboardPage({ onNavigate, patients = demoPatients }) {
     <section className="content-grid">
       <article className="panel queue-panel">
         <div className="panel-heading"><div><div className="section-title-line"><h2>Fila de atendimento</h2><span className="live-tag"><i/> AO VIVO</span></div><p>Prioridade definida pelo profissional de saúde</p></div><button className="text-link" onClick={() => onNavigate('Fila de atendimento')}>Ver fila completa <Icon name="chevron" size={16}/></button></div>
-        <div className="queue-toolbar"><label className="search-box"><Icon name="search" size={17}/><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar paciente..." aria-label="Buscar paciente na prévia da fila"/><kbd>⌘ K</kbd></label><div className="queue-summary"><span className="summary-dot"/> {search ? `${filteredPatients.length} resultado(s)` : '5 de 9 pacientes'}</div></div>
+        <div className="queue-toolbar"><label className="search-box"><Icon name="search" size={17}/><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar paciente..." aria-label="Buscar paciente na prévia da fila"/><kbd>⌘ K</kbd></label><div className="queue-summary"><span className="summary-dot"/> {search ? `${filteredPatients.length} resultado(s)` : `${Math.min(5, activePatients.length)} de ${activePatients.length} pacientes`}</div></div>
         <div className="queue-table-wrap"><table className="queue-table"><thead><tr><th>POSIÇÃO</th><th>PACIENTE</th><th>PRIORIDADE</th><th>ESPERA</th><th>STATUS</th><th><span className="sr-only">Abrir paciente</span></th></tr></thead><tbody>{filteredPatients.map((patient, index) => <tr key={patient.name}>
           <td><span className={`position-number ${index === 0 ? 'first-position' : ''}`}>{String(index + 1).padStart(2,'0')}</span></td>
           <td><div className="patient-cell"><div className={`patient-avatar patient-avatar-${index}`}>{patient.initials}</div><div><strong>{patient.name}</strong><small>{patient.reason} <span>·</span> {patient.time}</small></div></div></td>
@@ -67,8 +76,8 @@ export default function DashboardPage({ onNavigate, patients = demoPatients }) {
 
       <div className="right-column">
         <article className="panel distribution-panel"><div className="panel-heading compact-heading"><div><h2>Distribuição por prioridade</h2><p>Pacientes na fila agora</p></div><button className="period-select" onClick={() => setPeriod(period === 'Hoje' ? 'Esta semana' : 'Hoje')}>{period}<Icon name="down" size={15}/></button></div>
-          <div className="distribution-summary"><div className="donut" role="img" aria-label="Distribuição de pacientes por prioridade"><div><strong>09</strong><span>pacientes</span></div></div><div className="distribution-note"><span className="note-icon"><Icon name="activity" size={17}/></span><span><strong>Fila equilibrada</strong><small>Distribuição atualizada em tempo real</small></span></div></div>
-          <div className="priority-legend">{distribution.map(item => <div className="legend-row" key={item.level}><span className={`legend-color legend-${item.color}`}/><span className="legend-name">{item.name}</span><span className="legend-count">{item.amount}</span><span className="legend-percent">{Math.round(item.amount / 9 * 100)}%</span></div>)}</div>
+          <div className="distribution-summary"><div className="donut" style={{background:donutGradient}} role="img" aria-label="Distribuição de pacientes por prioridade"><div><strong>{String(activePatients.length).padStart(2, '0')}</strong><span>pacientes</span></div></div><div className="distribution-note"><span className="note-icon"><Icon name="activity" size={17}/></span><span><strong>Fila equilibrada</strong><small>Distribuição atualizada em tempo real</small></span></div></div>
+          <div className="priority-legend">{distribution.map(item => <div className="legend-row" key={item.level}><span className={`legend-color legend-${item.color}`}/><span className="legend-name">{item.name}</span><span className="legend-count">{item.amount}</span><span className="legend-percent">{activePatients.length ? Math.round(item.amount / activePatients.length * 100) : 0}%</span></div>)}</div>
         </article>
         <article className="alert-card"><div className="alert-icon"><Icon name="activity" size={18}/></div><div className="alert-copy"><strong>Atenção à espera</strong><p>2 pacientes aguardam há mais de 30 minutos.</p></div><button aria-label="Ver pacientes aguardando" onClick={() => onNavigate('Fila de atendimento')}><Icon name="chevron" size={17}/></button></article>
         <article className="panel shift-panel"><div className="shift-heading"><span className="shift-icon"><Icon name="calendar" size={17}/></span><div><strong>Resumo do turno</strong><small>Turno da manhã <span>·</span> 07:00–13:00</small></div><span className="shift-tag">EM ANDAMENTO</span></div><div className="shift-stats"><div><strong>41</strong><span>chegadas</span></div><div><strong>32</strong><span>concluídos</span></div><div><strong>09</strong><span>na fila</span></div></div><div className="shift-progress"><span style={{width:'78%'}}/></div></article>
