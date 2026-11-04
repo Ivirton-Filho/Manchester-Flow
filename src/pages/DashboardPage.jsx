@@ -1,16 +1,6 @@
 import { useMemo, useState } from 'react'
 import Icon from '../components/Icon.jsx'
-
-const patients = [
-  { name: 'Paciente Teste 01', initials: 'PT', reason: 'Dor abdominal', priority: 'Vermelho', waiting: '08 min', status: 'Aguardando', time: '10:42' },
-  { name: 'Maria Fictícia', initials: 'MF', reason: 'Mal-estar e tontura', priority: 'Laranja', waiting: '18 min', status: 'Aguardando', time: '10:32' },
-  { name: 'Lucas Ilustrativo', initials: 'LI', reason: 'Dor no peito', priority: 'Laranja', waiting: '22 min', status: 'Em atendimento', time: '10:28' },
-  { name: 'João Exemplo', initials: 'JE', reason: 'Dor de cabeça', priority: 'Amarelo', waiting: '26 min', status: 'Aguardando', time: '10:24' },
-  { name: 'Beatriz Modelo', initials: 'BM', reason: 'Mal-estar', priority: 'Amarelo', waiting: '32 min', status: 'Aguardando', time: '10:18' },
-  { name: 'Ana Demonstração', initials: 'AD', reason: 'Tosse persistente', priority: 'Amarelo', waiting: '36 min', status: 'Aguardando', time: '10:14' },
-  { name: 'Rafael Exemplo', initials: 'RE', reason: 'Dor no ombro', priority: 'Verde', waiting: '41 min', status: 'Aguardando', time: '10:09' },
-  { name: 'Carlos Modelo', initials: 'CM', reason: 'Retorno', priority: 'Azul', waiting: '53 min', status: 'Aguardando', time: '09:57' },
-]
+import { demoPatients } from '../data/demoPatients.js'
 
 const distribution = [
   { name: 'Emergência', level: 'Vermelho', amount: 1, color: 'red' },
@@ -35,7 +25,7 @@ function MetricCard({ icon, tone, title, value, suffix, trend, caption, children
   </article>
 }
 
-export default function DashboardPage({ onNavigate }) {
+export default function DashboardPage({ onNavigate, patients = demoPatients }) {
   const [period, setPeriod] = useState('Hoje')
   const [search, setSearch] = useState('')
   const filteredPatients = useMemo(() => patients.filter(p => `${p.name} ${p.reason}`.toLowerCase().includes(search.toLowerCase())).slice(0, 5), [search])

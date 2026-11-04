@@ -4,10 +4,13 @@ import Topbar from './components/Topbar.jsx'
 import MobileNav from './components/MobileNav.jsx'
 import Toast from './components/Toast.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
+import QueuePage from './pages/QueuePage.jsx'
+import { demoPatients } from './data/demoPatients.js'
 
 export default function App() {
   const [activeItem, setActiveItem] = useState('Painel')
   const [notice, setNotice] = useState('')
+  const [patients, setPatients] = useState(demoPatients)
 
   function showNotice(message) {
     setNotice(message)
@@ -16,14 +19,20 @@ export default function App() {
 
   function navigate(label) {
     setActiveItem(label)
-    if (label !== 'Painel') showNotice(`${label} será a próxima etapa do protótipo.`)
+    if (!['Painel', 'Fila de atendimento'].includes(label)) showNotice(`${label} será a próxima etapa do protótipo.`)
+  }
+
+  function updatePatientStatus(id, status) {
+    setPatients(current => current.map(patient => patient.id === id ? { ...patient, status } : patient))
   }
 
   return <div className="app-shell">
     <Sidebar activeItem={activeItem} onNavigate={navigate} onExit={() => showNotice('A saída de sessão não está disponível nesta etapa.')}/>
     <div className="main-column">
-      <Topbar onNotice={() => showNotice('Você está em dia. Nenhum aviso novo.')}/>
-      <DashboardPage onNavigate={navigate}/>
+      <Topbar pageName={activeItem === 'Fila de atendimento' ? 'Fila' : activeItem} onNotice={() => showNotice('Você está em dia. Nenhum aviso novo.')}/>
+      {activeItem === 'Fila de atendimento'
+        ? <QueuePage patients={patients} onNavigate={navigate} onUpdatePatient={updatePatientStatus} onNotice={showNotice}/>
+        : <DashboardPage onNavigate={navigate} patients={patients}/>}
     </div>
     <MobileNav activeItem={activeItem} onNavigate={navigate} onMore={() => showNotice('Menu de navegação completo nas próximas etapas.')}/>
     <Toast message={notice}/>
