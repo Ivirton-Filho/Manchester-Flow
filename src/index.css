@@ -380,3 +380,89 @@
   .queue-mobile-arrival{margin-left:0}
   .mobile-nav>button{min-width:58px}
 }
+
+/* Sistema de movimento: orienta a leitura e confirma cada ação operacional. */
+:root{--motion-ease:cubic-bezier(.2,.7,.25,1);--motion-snap:cubic-bezier(.2,.9,.25,1)}
+@keyframes motion-enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes motion-row{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+@keyframes motion-pop{0%{opacity:0;transform:scale(.92)}70%{opacity:1;transform:scale(1.015)}100%{opacity:1;transform:scale(1)}}
+@keyframes motion-backdrop{from{opacity:0}to{opacity:1}}
+@keyframes motion-modal{from{opacity:0;transform:translateY(16px) scale(.975)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes motion-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.18);opacity:.72}}
+@keyframes motion-marker{from{transform:scaleY(.25);opacity:.2}to{transform:scaleY(1);opacity:1}}
+@keyframes motion-select{from{transform:scale(.985)}to{transform:scale(1)}}
+
+button:not(:disabled),.priority-choice,.symptom-chip,.nav-item,.mobile-nav>button,.icon-button,
+.queue-open-button,.history-mobile-open,.queue-mobile-action{
+  transition:transform .18s var(--motion-ease),box-shadow .18s var(--motion-ease),background-color .18s ease,border-color .18s ease,color .18s ease,opacity .18s ease;
+}
+input,textarea,select{
+  transition:transform .18s var(--motion-ease),box-shadow .18s var(--motion-ease),border-color .18s ease,background-color .18s ease;
+}
+input:focus,textarea:focus,select:focus{transform:translateY(-1px)}
+button:not(:disabled):active,.priority-choice:active,.symptom-chip:active{transform:translateY(0) scale(.98)}
+.primary-button:hover,.queue-open-button:hover,.queue-mobile-action:hover,.history-mobile-open:hover,
+.queue-secondary-button:hover,.clear-queue-filters:hover,.history-clear-button:hover{transform:translateY(-2px);box-shadow:0 7px 15px #214b7118}
+.primary-button:hover svg,.queue-open-button:hover svg,.queue-mobile-action:hover svg,.history-mobile-open:hover svg{transform:translateX(2px)}
+.primary-button svg,.queue-open-button svg,.queue-mobile-action svg,.history-mobile-open svg{transition:transform .18s var(--motion-ease)}
+.nav-item:hover:not(:disabled),.mobile-nav>button:hover{transform:translateX(2px)}
+.mobile-nav>button:hover{transform:translateY(-2px)}
+.nav-item.active:before{animation:motion-marker .28s var(--motion-snap) both;transform-origin:center}
+.breadcrumb-current{animation:motion-enter .24s var(--motion-ease) both}
+
+/* Abertura das quatro telas, com a ação principal chegando antes dos detalhes. */
+.dashboard:not(.queue-page):not(.triage-page):not(.history-page) .welcome-row,
+.dashboard:not(.queue-page):not(.triage-page):not(.history-page) .metric-card,
+.dashboard:not(.queue-page):not(.triage-page):not(.history-page) .content-grid>.panel,
+.dashboard:not(.queue-page):not(.triage-page):not(.history-page) .right-column>*,
+.dashboard:not(.queue-page):not(.triage-page):not(.history-page) .disclaimer,
+.queue-page>.queue-page-heading,.queue-page>.queue-stat-grid,.queue-page>.next-patient-card,
+.queue-page>.queue-list-panel,.queue-page>.disclaimer,.triage-page>.triage-page-heading,
+.triage-page>.triage-stepper,.triage-page>.triage-layout,.triage-page>.disclaimer,
+.history-page>.history-heading,.history-page>.history-panel,.history-page>.disclaimer{
+  animation:motion-enter .44s var(--motion-ease) both;
+}
+.dashboard:not(.queue-page):not(.triage-page):not(.history-page) .metric-card:nth-child(1),
+.queue-page>.queue-stat-grid{animation-delay:.06s}
+.dashboard:not(.queue-page):not(.triage-page):not(.history-page) .metric-card:nth-child(2),
+.queue-page>.next-patient-card,.triage-page>.triage-stepper,.history-page>.history-panel{animation-delay:.12s}
+.dashboard:not(.queue-page):not(.triage-page):not(.history-page) .metric-card:nth-child(3),
+.queue-page>.queue-list-panel,.triage-page>.triage-layout{animation-delay:.18s}
+.dashboard:not(.queue-page):not(.triage-page):not(.history-page) .metric-card:nth-child(4),
+.triage-page>.disclaimer,.history-page>.disclaimer{animation-delay:.24s}
+.dashboard:not(.queue-page):not(.triage-page):not(.history-page) .content-grid>.panel{animation-delay:.25s}
+.dashboard:not(.queue-page):not(.triage-page):not(.history-page) .right-column>*:nth-child(1){animation-delay:.29s}
+.dashboard:not(.queue-page):not(.triage-page):not(.history-page) .right-column>*:nth-child(2){animation-delay:.34s}
+.dashboard:not(.queue-page):not(.triage-page):not(.history-page) .right-column>*:nth-child(3),
+.queue-page>.disclaimer{animation-delay:.39s}
+
+/* Listas e campos novos revelam-se pela ordem em que devem ser lidos. */
+.queue-stat-card,.queue-page-table tbody tr,.history-table tbody tr,.queue-mobile-card,.history-mobile-card,
+.triage-fields>.triage-field,.triage-fields>.auto-time-field,.triage-fields>.symptom-fieldset,
+.triage-fields>.priority-fieldset,.triage-fields>.vitals-note,.triage-review,.triage-reference-note{
+  animation:motion-row .32s var(--motion-ease) both;
+}
+.queue-stat-card:nth-child(1),.queue-page-table tbody tr:nth-child(1),.history-table tbody tr:nth-child(1),
+.queue-mobile-card:nth-child(1),.history-mobile-card:nth-child(1),.triage-fields>*:nth-child(1){animation-delay:.05s}
+.queue-stat-card:nth-child(2),.queue-page-table tbody tr:nth-child(2),.history-table tbody tr:nth-child(2),
+.queue-mobile-card:nth-child(2),.history-mobile-card:nth-child(2),.triage-fields>*:nth-child(2){animation-delay:.1s}
+.queue-stat-card:nth-child(3),.queue-page-table tbody tr:nth-child(3),.history-table tbody tr:nth-child(3),
+.queue-mobile-card:nth-child(3),.history-mobile-card:nth-child(3),.triage-fields>*:nth-child(3){animation-delay:.15s}
+.queue-page-table tbody tr:nth-child(4),.history-table tbody tr:nth-child(4),.queue-mobile-card:nth-child(4),
+.history-mobile-card:nth-child(4),.triage-fields>*:nth-child(4){animation-delay:.2s}
+.queue-page-table tbody tr:nth-child(5),.history-table tbody tr:nth-child(5),.queue-mobile-card:nth-child(5),
+.history-mobile-card:nth-child(5),.triage-fields>*:nth-child(5){animation-delay:.25s}
+.donut,.history-total,.triage-arrival-chip{animation:motion-pop .4s var(--motion-snap) both}
+
+/* Seleções, estados sincronizados e retornos de validação. */
+.symptom-chip.selected,.priority-choice.selected,.progress-step.current{animation:motion-select .24s var(--motion-snap) both}
+.live-pulse,.live-tag i,.queue-live i,.online-indicator span,.eyebrow-dot{animation:motion-pulse 2.6s ease-in-out infinite}
+.queue-modal-backdrop{animation:motion-backdrop .18s ease both}
+.queue-modal{animation:motion-modal .34s var(--motion-snap) both}
+.completion-confirmation,.triage-error-summary{animation:motion-enter .28s var(--motion-ease) both}
+.history-timeline>div{animation:motion-row .3s var(--motion-ease) both}
+.history-timeline>div:nth-child(2){animation-delay:.07s}.history-timeline>div:nth-child(3){animation-delay:.14s}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
+}

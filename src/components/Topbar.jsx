@@ -5,7 +5,7 @@ export default function Topbar({ onNotice, pageName = 'Painel', notificationCoun
   const todayLabel = today.charAt(0).toLocaleUpperCase('pt-BR') + today.slice(1)
 
   return <header className="topbar">
-    <div className="breadcrumbs"><span>Início</span><Icon name="chevron" size={14}/><strong>{pageName}</strong></div>
+    <div className="breadcrumbs"><span>Início</span><Icon name="chevron" size={14}/><strong key={pageName} className="breadcrumb-current">{pageName}</strong></div>
     <div className="topbar-actions">
       <span className="today-chip"><Icon name="calendar" size={16}/> {todayLabel}</span>
       <button className="icon-button notification-button" aria-label={`${notificationCount} avisos de espera`} onClick={onNotice}><Icon name="bell"/>{notificationCount > 0 && <i/>}</button>
