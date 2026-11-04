@@ -20,7 +20,7 @@ export default function App() {
   }
 
   return <div className="app-shell">
-    <Sidebar activeItem={activeItem} onNavigate={navigate}/>
+    <Sidebar activeItem={activeItem} onNavigate={navigate} onExit={() => showNotice('A saída de sessão não está disponível nesta etapa.')}/>
     <div className="main-column">
       <Topbar onNotice={() => showNotice('Você está em dia. Nenhum aviso novo.')}/>
       <DashboardPage onNavigate={navigate}/>
