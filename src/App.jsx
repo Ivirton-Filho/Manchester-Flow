@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Sidebar from './components/Sidebar.jsx'
 import Topbar from './components/Topbar.jsx'
 import MobileNav from './components/MobileNav.jsx'
@@ -9,12 +9,21 @@ import NewTriagePage from './pages/NewTriagePage.jsx'
 import HistoryPage from './pages/HistoryPage.jsx'
 import { demoPatients } from './data/demoPatients.js'
 import { demoHistory } from './data/demoHistory.js'
+import { elapsedWaitMinutes, formatClock, formatWaitTime, localDateKey } from './utils/patientTime.js'
 
 export default function App() {
   const [activeItem, setActiveItem] = useState('Painel')
   const [notice, setNotice] = useState('')
   const [patients, setPatients] = useState(demoPatients)
   const [historyRecords, setHistoryRecords] = useState(demoHistory)
+  const [now, setNow] = useState(() => Date.now())
+  const activeQueueCount = patients.filter(patient => ['Aguardando', 'Em atendimento'].includes(patient.status)).length
+  const longWaitCount = patients.filter(patient => patient.status === 'Aguardando' && elapsedWaitMinutes(patient, now) > 30).length
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 30_000)
+    return () => window.clearInterval(timer)
+  }, [])
 
   function showNotice(message) {
     setNotice(message)
@@ -27,16 +36,20 @@ export default function App() {
   }
 
   function updatePatientStatus(id, status) {
-    setPatients(current => current.map(patient => patient.id === id ? { ...patient, status } : patient))
+    setPatients(current => current.map(patient => {
+      if (patient.id !== id) return patient
+      if (status === 'Em atendimento') return { ...patient, status, waitingMinutesAtStart: elapsedWaitMinutes(patient) }
+      return { ...patient, status }
+    }))
   }
 
   function completePatient(id) {
     const patient = patients.find(item => item.id === id)
     if (!patient) return
 
-    const now = new Date()
-    const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-    const completedAt = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    const completedNow = new Date()
+    const date = localDateKey(completedNow)
+    const completedAt = formatClock(completedNow)
     const vitals = patient.vitals || {}
 
     setPatients(current => current.map(item => item.id === id ? { ...item, status: 'Concluída' } : item))
@@ -47,10 +60,12 @@ export default function App() {
       reason: patient.reason,
       priority: patient.priority,
       date,
+      arrivedAt: patient.arrivedAt || null,
+      triagedAt: patient.triagedAt || null,
       arrival: patient.time,
-      triageTime: patient.triageTime || patient.time,
+      triageTime: patient.triagedAt ? formatClock(patient.triagedAt) : '—',
       completedAt,
-      wait: patient.waiting,
+      wait: formatWaitTime(patient, completedNow.getTime()),
       symptoms: patient.symptoms || patient.reason,
       vitals: {
         temperature: vitals.temperature || '—',
@@ -70,16 +85,16 @@ export default function App() {
   }
 
   return <div className="app-shell">
-    <Sidebar activeItem={activeItem} onNavigate={navigate}/>
+    <Sidebar activeItem={activeItem} onNavigate={navigate} queueCount={activeQueueCount}/>
     <div className="main-column">
-      <Topbar pageName={activeItem === 'Fila de atendimento' ? 'Fila' : activeItem} onNotice={() => showNotice('Você está em dia. Nenhum aviso novo.')}/>
+      <Topbar pageName={activeItem === 'Fila de atendimento' ? 'Fila' : activeItem} notificationCount={longWaitCount} onNotice={() => showNotice(longWaitCount ? `${longWaitCount} pacientes aguardam há mais de 30 minutos.` : 'Nenhum paciente aguarda há mais de 30 minutos.')}/>
       {activeItem === 'Fila de atendimento'
-        ? <QueuePage patients={patients} onNavigate={navigate} onUpdatePatient={updatePatientStatus} onCompletePatient={completePatient} onNotice={showNotice}/>
+        ? <QueuePage patients={patients} now={now} onNavigate={navigate} onUpdatePatient={updatePatientStatus} onCompletePatient={completePatient} onNotice={showNotice}/>
         : activeItem === 'Nova triagem'
           ? <NewTriagePage onNavigate={navigate} onSave={saveTriage}/>
           : activeItem === 'Histórico'
             ? <HistoryPage records={historyRecords}/>
-            : <DashboardPage onNavigate={navigate} patients={patients}/>}
+            : <DashboardPage onNavigate={navigate} patients={patients} historyRecords={historyRecords} now={now}/>}
     </div>
     <MobileNav activeItem={activeItem} onNavigate={navigate} onMore={() => showNotice('Menu de navegação completo nas próximas etapas.')}/>
     <Toast message={notice}/>

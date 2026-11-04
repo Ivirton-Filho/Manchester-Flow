@@ -306,3 +306,12 @@
 .confirm-completion-button{border:0;border-radius:7px;background:#0757aa;color:#fff;font-weight:700}
 .confirm-completion-button:hover{background:#03449a}
 @media(max-width:640px){.completion-confirmation{flex-wrap:wrap;gap:7px}.completion-confirmation>div{min-width:calc(100% - 35px)}.completion-confirmation .queue-secondary-button,.confirm-completion-button{flex:1;min-height:40px}}
+
+.queue-sync-tag{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid #dbece2;border-radius:8px;background:#f5fbf6;color:#397d4e;font-size:9px;font-weight:700;white-space:nowrap}
+.queue-sync-tag svg{color:#43a66d}
+.alert-card.alert-clear{border-color:#d9ebdf;background:#f5fbf6}
+.alert-clear .alert-icon{background:#e6f5eb;color:#41935d}
+.alert-clear .alert-copy strong{color:#3e7650}
+.alert-clear .alert-copy p{color:#718e79}
+.alert-clear button{color:#679378}
+@media(max-width:640px){.queue-sync-tag{font-size:0;width:36px;height:36px;justify-content:center;padding:0;flex:none}.queue-sync-tag svg{width:17px;height:17px}}

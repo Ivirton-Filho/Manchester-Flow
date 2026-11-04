@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Icon from '../components/Icon.jsx'
+import { formatClock } from '../utils/patientTime.js'
 
 const steps = ['Dados iniciais', 'Sintomas', 'Sinais vitais', 'Prioridade']
 const symptomOptions = ['Dor', 'Febre', 'Tosse', 'Falta de ar', 'Tontura', 'Náusea', 'Mal-estar', 'Outro']
@@ -40,7 +41,8 @@ export default function NewTriagePage({ onSave, onNavigate }) {
   const [form, setForm] = useState(emptyForm)
   const [errors, setErrors] = useState({})
   const [showSummary, setShowSummary] = useState(false)
-  const [arrivalTime] = useState(() => new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }))
+  const [arrivalAt] = useState(() => new Date().toISOString())
+  const arrivalTime = formatClock(arrivalAt)
 
   function updateField(name, value) {
     setForm(current => ({ ...current, [name]: value }))
@@ -96,10 +98,10 @@ export default function NewTriagePage({ onSave, onNavigate }) {
       initials: form.name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase(),
       reason: form.reason.trim(),
       priority: form.priority,
-      waiting: '00 min',
-      waitingMinutes: 0,
       status: 'Aguardando',
       time: arrivalTime,
+      arrivedAt: arrivalAt,
+      triagedAt: new Date().toISOString(),
       symptoms: [...form.selectedSymptoms, form.symptoms.trim()].filter(Boolean).join(', '),
       vitals: { temperature: form.temperature, heartRate: form.heartRate, respiratoryRate: form.respiratoryRate, bloodPressure: form.bloodPressure, oxygen: form.oxygen, pain: form.pain },
     })

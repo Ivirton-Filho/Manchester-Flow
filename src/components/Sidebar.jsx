@@ -3,17 +3,17 @@ import Icon from './Icon.jsx'
 
 const navigation = [
   { label: 'Painel', icon: 'grid' },
-  { label: 'Fila', activeLabel: 'Fila de atendimento', icon: 'queue', count: '7' },
+  { label: 'Fila', activeLabel: 'Fila de atendimento', icon: 'queue' },
   { label: 'Nova triagem', icon: 'plus' },
   { label: 'Histórico', icon: 'clock' },
 ]
 
-export default function Sidebar({ activeItem, onNavigate }) {
+export default function Sidebar({ activeItem, onNavigate, queueCount }) {
   return <aside className="sidebar">
     <Brand />
     <nav className="side-nav" aria-label="Navegação principal">
       {navigation.map(item => <button key={item.label} className={`nav-item ${activeItem === (item.activeLabel || item.label) ? 'active' : ''}`} onClick={() => onNavigate(item.activeLabel || item.label)}>
-        <Icon name={item.icon}/><span>{item.label}</span>{item.count && <span className="nav-count">{item.count}</span>}
+        <Icon name={item.icon}/><span>{item.label}</span>{item.activeLabel && <span className="nav-count">{queueCount}</span>}
       </button>)}
       <button className="nav-item nav-item-upcoming" disabled aria-disabled="true"><Icon name="chart"/><span>Relatórios</span><span className="soon-label">EM BREVE</span></button>
     </nav>

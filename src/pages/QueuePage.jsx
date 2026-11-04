@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import Icon from '../components/Icon.jsx'
+import { elapsedWaitMinutes, formatWaitTime } from '../utils/patientTime.js'
 
 const priorityOrder = { Vermelho: 0, Laranja: 1, Amarelo: 2, Verde: 3, Azul: 4 }
 const priorities = ['Vermelho', 'Laranja', 'Amarelo', 'Verde', 'Azul']
@@ -17,12 +18,12 @@ function StatusBadge({ value }) {
   return <span className={`status status-${state}`}><Icon name={icon} size={14}/>{value}</span>
 }
 
-function PatientDetails({ patient, onClose, onStart, onRequestComplete, onConfirmComplete, onCancelCompletion, confirmingCompletion }) {
+function PatientDetails({ patient, now, onClose, onStart, onRequestComplete, onConfirmComplete, onCancelCompletion, confirmingCompletion }) {
   if (!patient) return null
   return <div className="queue-modal-backdrop" onMouseDown={onClose}>
     <section className="queue-modal" role="dialog" aria-modal="true" aria-labelledby="patient-modal-title" onMouseDown={event => event.stopPropagation()}>
       <div className="queue-modal-header"><div><span className="eyebrow">REGISTRO DE TRIAGEM</span><h2 id="patient-modal-title">{patient.name}</h2><p>{patient.reason} <span>·</span> chegada às {patient.time}</p></div><button className="queue-modal-close" onClick={onClose} aria-label="Fechar"><span aria-hidden="true">×</span></button></div>
-      <div className="queue-modal-facts"><div><small>PRIORIDADE</small><PriorityBadge value={patient.priority}/></div><div><small>TEMPO DE ESPERA</small><strong>{patient.waiting}</strong></div><div><small>STATUS</small><StatusBadge value={patient.status}/></div></div>
+      <div className="queue-modal-facts"><div><small>PRIORIDADE</small><PriorityBadge value={patient.priority}/></div><div><small>TEMPO DE ESPERA</small><strong>{formatWaitTime(patient, now)}</strong></div><div><small>STATUS</small><StatusBadge value={patient.status}/></div></div>
       <p className="queue-modal-note">A prioridade exibida foi definida por um profissional de saúde. O sistema apoia a organização da fila e não realiza diagnóstico.</p>
       {confirmingCompletion && <div className="completion-confirmation" role="alert"><Icon name="alert" size={17}/><div><strong>Concluir este atendimento?</strong><span>O registro será movido ao Histórico e ficará somente para leitura.</span></div><button className="queue-secondary-button" onClick={onCancelCompletion}>Voltar</button><button className="confirm-completion-button" onClick={() => onConfirmComplete(patient)}>Sim, concluir</button></div>}
       <div className="queue-modal-actions"><button className="queue-secondary-button" onClick={onClose}>Voltar à fila</button>{patient.status === 'Aguardando' ? <button className="primary-button" onClick={() => onStart(patient)}>Iniciar atendimento <Icon name="chevron" size={16}/></button> : !confirmingCompletion && <button className="primary-button" onClick={onRequestComplete}>Concluir atendimento <Icon name="check" size={16}/></button>}</div>
@@ -30,7 +31,7 @@ function PatientDetails({ patient, onClose, onStart, onRequestComplete, onConfir
   </div>
 }
 
-export default function QueuePage({ patients, onNavigate, onUpdatePatient, onCompletePatient, onNotice }) {
+export default function QueuePage({ patients, now = Date.now(), onNavigate, onUpdatePatient, onCompletePatient, onNotice }) {
   const [query, setQuery] = useState('')
   const [priorityFilter, setPriorityFilter] = useState('Todas as prioridades')
   const [statusFilter, setStatusFilter] = useState('Todos os status')
@@ -38,7 +39,7 @@ export default function QueuePage({ patients, onNavigate, onUpdatePatient, onCom
   const [confirmingCompletion, setConfirmingCompletion] = useState(false)
 
   const activePatients = useMemo(() => patients.filter(patient => ['Aguardando', 'Em atendimento'].includes(patient.status)), [patients])
-  const orderedPatients = useMemo(() => [...activePatients].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority] || a.time.localeCompare(b.time)), [activePatients])
+  const orderedPatients = useMemo(() => [...activePatients].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority] || Date.parse(a.arrivedAt || '') - Date.parse(b.arrivedAt || '') || a.time.localeCompare(b.time)), [activePatients])
   const visiblePatients = useMemo(() => orderedPatients.filter(patient => {
     const matchesQuery = `${patient.name} ${patient.reason}`.toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR'))
     const matchesPriority = priorityFilter === 'Todas as prioridades' || patient.priority === priorityFilter
@@ -80,8 +81,8 @@ export default function QueuePage({ patients, onNavigate, onUpdatePatient, onCom
 
   return <main className="dashboard queue-page">
     <section className="queue-page-heading">
-      <div><div className="eyebrow"><span className="eyebrow-dot"/> ATENDIMENTO · TEMPO REAL</div><h1>Fila de atendimento</h1><p>Prioridade definida pelo profissional de saúde; desempate pelo horário de chegada.</p></div>
-      <button className="queue-refresh-button" onClick={() => onNotice('Fila atualizada.') }><Icon name="activity" size={17}/> Atualizar fila</button>
+      <div><div className="eyebrow"><span className="eyebrow-dot"/> ATENDIMENTO</div><h1>Fila de atendimento</h1><p>Prioridade definida pelo profissional de saúde; desempate pelo horário de chegada.</p></div>
+      <span className="queue-sync-tag"><Icon name="check" size={14}/> Sincronizada com o painel</span>
     </section>
 
     <section className="queue-stat-grid" aria-label="Resumo da fila">
@@ -94,12 +95,12 @@ export default function QueuePage({ patients, onNavigate, onUpdatePatient, onCom
       <div className="next-patient-marker"><Icon name="users" size={20}/></div>
       <div className="next-patient-copy"><small>PRÓXIMO PARA ATENDIMENTO</small><strong>{nextPatient.name}</strong><span>{nextPatient.reason} <i>·</i> chegou às {nextPatient.time}</span></div>
       <PriorityBadge value={nextPatient.priority}/>
-      <div className="next-wait"><small>ESPERA</small><strong>{nextPatient.waiting}</strong></div>
+      <div className="next-wait"><small>ESPERA</small><strong>{formatWaitTime(nextPatient, now)}</strong></div>
       <button className="primary-button" onClick={() => openDetails(nextPatient)}>Abrir registro <Icon name="chevron" size={16}/></button>
     </section>}
 
     <section className="queue-list-panel">
-      <div className="queue-list-heading"><div><h2>Pacientes na fila <span>{activePatients.length}</span></h2><p>Ordenados por prioridade e horário de chegada</p></div><span className="queue-live"><i/> Fila ativa</span></div>
+      <div className="queue-list-heading"><div><h2>Pacientes na fila <span>{activePatients.length}</span></h2><p>Ordenados por prioridade e horário de chegada</p></div><span className="queue-live"><i/> Sincronizada</span></div>
       <div className="queue-filters">
         <label className="queue-search"><Icon name="search" size={18}/><input aria-label="Buscar paciente por nome ou motivo" placeholder="Buscar por nome ou motivo..." value={query} onChange={event => setQuery(event.target.value)}/></label>
         <label className="queue-select-label"><span>Prioridade</span><select value={priorityFilter} onChange={event => setPriorityFilter(event.target.value)}><option>Todas as prioridades</option>{priorities.map(priority => <option key={priority}>{priority}</option>)}</select></label>
@@ -110,21 +111,21 @@ export default function QueuePage({ patients, onNavigate, onUpdatePatient, onCom
       <div className="queue-desktop-table-wrap"><table className="queue-page-table"><thead><tr><th>POSIÇÃO</th><th>PACIENTE</th><th>PRIORIDADE</th><th>ESPERA</th><th>STATUS</th><th><span className="sr-only">Ação</span></th></tr></thead><tbody>{visiblePatients.map((patient, index) => <tr key={patient.id}>
         <td><span className={`position-number ${index === 0 && patient.status === 'Aguardando' ? 'first-position' : ''}`}>{String(index + 1).padStart(2, '0')}</span></td>
         <td><div className="patient-cell"><div className={`patient-avatar patient-avatar-${index % 5}`}>{patient.initials}</div><div><strong>{patient.name}</strong><small>{patient.reason} <span>·</span> Chegada {patient.time}</small></div></div></td>
-        <td><PriorityBadge value={patient.priority}/></td><td><span className={`wait-time ${patient.waitingMinutes >= 30 ? 'wait-critical' : ''}`}>{patient.waiting}</span></td>
+        <td><PriorityBadge value={patient.priority}/></td><td><span className={`wait-time ${elapsedWaitMinutes(patient, now) > 30 ? 'wait-critical' : ''}`}>{formatWaitTime(patient, now)}</span></td>
         <td><StatusBadge value={patient.status}/></td><td><button className="queue-open-button" onClick={() => openDetails(patient)}>Abrir <Icon name="chevron" size={15}/></button></td>
       </tr>)}</tbody></table></div>
 
       <div className="queue-mobile-cards">{visiblePatients.map((patient, index) => <article className="queue-mobile-card" key={patient.id}>
         <div className="queue-mobile-card-top"><span className={`position-number ${index === 0 && patient.status === 'Aguardando' ? 'first-position' : ''}`}>#{String(index + 1).padStart(2, '0')}</span><StatusBadge value={patient.status}/></div>
         <div className="queue-mobile-person"><div className={`patient-avatar patient-avatar-${index % 5}`}>{patient.initials}</div><div><strong>{patient.name}</strong><small>{patient.reason}</small></div></div>
-        <div className="queue-mobile-facts"><PriorityBadge value={patient.priority}/><span className={`wait-time ${patient.waitingMinutes >= 30 ? 'wait-critical' : ''}`}><Icon name="clock" size={14}/>{patient.waiting}</span><span className="queue-mobile-arrival">Chegada {patient.time}</span></div>
+        <div className="queue-mobile-facts"><PriorityBadge value={patient.priority}/><span className={`wait-time ${elapsedWaitMinutes(patient, now) > 30 ? 'wait-critical' : ''}`}><Icon name="clock" size={14}/>{formatWaitTime(patient, now)}</span><span className="queue-mobile-arrival">Chegada {patient.time}</span></div>
         <button className="queue-mobile-action" onClick={() => openDetails(patient)}>Abrir registro <Icon name="chevron" size={16}/></button>
       </article>)}</div>
 
       {visiblePatients.length === 0 && <div className="queue-empty"><span><Icon name={activePatients.length === 0 ? 'users' : 'search'} size={22}/></span><strong>{activePatients.length === 0 ? 'A fila está vazia' : 'Nenhum paciente encontrado'}</strong><p>{activePatients.length === 0 ? 'Novas chegadas aparecerão aqui após o cadastro.' : 'Altere ou remova os filtros para ver pacientes.'}</p>{filtersAreActive && <button onClick={clearFilters}>Limpar filtros</button>}</div>}
-      <div className="queue-list-footer"><span>Exibindo {visiblePatients.length} de {activePatients.length} pacientes</span><span>Atualizado agora mesmo</span></div>
+      <div className="queue-list-footer"><span>Exibindo {visiblePatients.length} de {activePatients.length} pacientes</span><span>Contagem compartilhada com o Painel</span></div>
     </section>
     <footer className="disclaimer"><span className="disclaimer-mark">i</span><span>Sistema de apoio à organização da triagem. <strong>Não realiza diagnóstico nem substitui a decisão do profissional de saúde.</strong> Dados fictícios.</span><span className="footer-made">Feito com <b>♥</b> pela Abacaxi Tech</span></footer>
-    <PatientDetails patient={selectedPatient} onClose={closeDetails} onStart={startPatient} onRequestComplete={() => setConfirmingCompletion(true)} onConfirmComplete={completePatient} onCancelCompletion={() => setConfirmingCompletion(false)} confirmingCompletion={confirmingCompletion}/>
+    <PatientDetails patient={selectedPatient} now={now} onClose={closeDetails} onStart={startPatient} onRequestComplete={() => setConfirmingCompletion(true)} onConfirmComplete={completePatient} onCancelCompletion={() => setConfirmingCompletion(false)} confirmingCompletion={confirmingCompletion}/>
   </main>
 }
