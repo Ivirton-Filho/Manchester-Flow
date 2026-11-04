@@ -28,6 +28,7 @@ function MetricCard({ icon, tone, title, value, suffix, trend, caption, children
 export default function DashboardPage({ onNavigate, patients = demoPatients }) {
   const [period, setPeriod] = useState('Hoje')
   const [search, setSearch] = useState('')
+  const todayLabel = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date()).toLocaleUpperCase('pt-BR')
   const activePatients = useMemo(() => patients.filter(patient => ['Aguardando', 'Em atendimento'].includes(patient.status)), [patients])
   const waitingCount = activePatients.filter(patient => patient.status === 'Aguardando').length
   const distribution = priorityLevels.map(level => ({ ...level, amount: activePatients.filter(patient => patient.priority === level.level).length }))
@@ -41,7 +42,7 @@ export default function DashboardPage({ onNavigate, patients = demoPatients }) {
 
   return <main className="dashboard">
     <section className="welcome-row">
-      <div><div className="eyebrow"><span className="eyebrow-dot"/> QUARTA-FEIRA, 4 DE NOVEMBRO DE 2026</div><h1>Painel geral <span className="wave">☀</span></h1><p>Acompanhe o movimento da unidade em tempo real.</p></div>
+      <div><div className="eyebrow"><span className="eyebrow-dot"/> {todayLabel}</div><h1>Painel geral <span className="wave">☀</span></h1><p>Acompanhe o movimento da unidade em tempo real.</p></div>
       <button className="primary-button" onClick={() => onNavigate('Nova triagem')}><Icon name="plus" size={19}/> Nova triagem</button>
     </section>
 
