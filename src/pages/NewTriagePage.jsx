@@ -18,6 +18,34 @@ const emptyForm = () => ({
   temperature: '', heartRate: '', respiratoryRate: '', bloodPressure: '', oxygen: '', pain: '', priority: '',
 })
 
+function parseVitalNumber(value) {
+  const normalized = value.trim().replace(',', '.')
+  if (!/^\d+(\.\d+)?$/.test(normalized)) return null
+  const number = Number(normalized)
+  return Number.isFinite(number) ? number : null
+}
+
+function validateVitalNumber(value, label, min, max, { integer = false } = {}) {
+  if (!value.trim()) return `Informe ${label}.`
+  const number = parseVitalNumber(value)
+  if (number === null) return `Use apenas um número válido para ${label}.`
+  if (integer && !Number.isInteger(number)) return `Informe ${label} sem casas decimais.`
+  if (number < min || number > max) return `Informe ${label} entre ${min} e ${max}${integer ? '' : ' (use vírgula ou ponto nos decimais)'}.`
+  return ''
+}
+
+function validateBloodPressure(value) {
+  if (!value.trim()) return 'Informe a pressão arterial no formato sistólica/diastólica, por exemplo 120/80.'
+  const match = value.trim().match(/^(\d{2,3})\s*\/\s*(\d{2,3})$/)
+  if (!match) return 'Use o formato sistólica/diastólica, por exemplo 120/80.'
+  const systolic = Number(match[1])
+  const diastolic = Number(match[2])
+  if (systolic < 30 || systolic > 300 || diastolic < 10 || diastolic > 200 || systolic <= diastolic) {
+    return 'Confira os valores: sistólica de 30 a 300 e diastólica de 10 a 200 mmHg, com sistólica maior que diastólica.'
+  }
+  return ''
+}
+
 function Stepper({ current }) {
   return <div className="triage-stepper" aria-label={`Etapa ${current + 1} de 4: ${steps[current]}`}>
     {steps.map((step, index) => <div key={step} className={`stepper-item ${index === current ? 'current' : ''} ${index < current ? 'completed' : ''}`}>
@@ -63,12 +91,13 @@ export default function NewTriagePage({ onSave, onNavigate }) {
     }
     if (step === 1 && !form.symptoms.trim() && form.selectedSymptoms.length === 0) nextErrors.symptoms = 'Selecione ao menos um sintoma ou descreva o relato.'
     if (step === 2) {
-      if (!form.temperature.trim()) nextErrors.temperature = 'Informe a temperatura.'
-      if (!form.heartRate.trim()) nextErrors.heartRate = 'Informe a frequência cardíaca.'
-      if (!form.respiratoryRate.trim()) nextErrors.respiratoryRate = 'Informe a frequência respiratória.'
-      if (!form.bloodPressure.trim()) nextErrors.bloodPressure = 'Informe a pressão arterial.'
-      if (!form.oxygen.trim()) nextErrors.oxygen = 'Informe a saturação de oxigênio.'
-      if (!form.pain.trim()) nextErrors.pain = 'Informe o nível de dor de 0 a 10.'
+      nextErrors.temperature = validateVitalNumber(form.temperature, 'a temperatura', 25, 45)
+      nextErrors.heartRate = validateVitalNumber(form.heartRate, 'a frequência cardíaca', 20, 300, { integer: true })
+      nextErrors.respiratoryRate = validateVitalNumber(form.respiratoryRate, 'a frequência respiratória', 4, 80, { integer: true })
+      nextErrors.bloodPressure = validateBloodPressure(form.bloodPressure)
+      nextErrors.oxygen = validateVitalNumber(form.oxygen, 'a saturação de oxigênio', 0, 100, { integer: true })
+      nextErrors.pain = validateVitalNumber(form.pain, 'o nível de dor', 0, 10, { integer: true })
+      for (const field of Object.keys(nextErrors)) if (!nextErrors[field]) delete nextErrors[field]
     }
     if (step === 3 && !form.priority) nextErrors.priority = 'Selecione a prioridade definida pelo profissional.'
     setErrors(nextErrors)
@@ -135,10 +164,10 @@ export default function NewTriagePage({ onSave, onNavigate }) {
           <Field label="Temperatura" name="temperature" value={form.temperature} onChange={updateField} error={errors.temperature} placeholder="36,5" unit="°C" inputMode="decimal"/>
           <Field label="Frequência cardíaca" name="heartRate" value={form.heartRate} onChange={updateField} error={errors.heartRate} placeholder="72" unit="bpm" inputMode="numeric"/>
           <Field label="Frequência respiratória" name="respiratoryRate" value={form.respiratoryRate} onChange={updateField} error={errors.respiratoryRate} placeholder="16" unit="irpm" inputMode="numeric"/>
-          <Field label="Pressão arterial" name="bloodPressure" value={form.bloodPressure} onChange={updateField} error={errors.bloodPressure} placeholder="120/80" unit="mmHg"/>
+          <Field label="Pressão arterial" name="bloodPressure" value={form.bloodPressure} onChange={updateField} error={errors.bloodPressure} placeholder="120/80" unit="mmHg" aria-label="Pressão arterial, formato sistólica sobre diastólica"/>
           <Field label="Saturação de oxigênio" name="oxygen" value={form.oxygen} onChange={updateField} error={errors.oxygen} placeholder="98" unit="%" inputMode="numeric"/>
           <Field label="Nível de dor" name="pain" value={form.pain} onChange={updateField} error={errors.pain} placeholder="0 a 10" unit="/ 10" inputMode="numeric"/>
-          <p className="vitals-note"><Icon name="info" size={15}/> Valores informados pelo profissional. Este sistema não interpreta sinais vitais.</p>
+          <p className="vitals-note"><Icon name="info" size={15}/> Faixas aceitas para validar o registro: temperatura 25–45 °C, FC 20–300 bpm, FR 4–80 irpm, pressão 30–300/10–200 mmHg, SpO₂ 0–100% e dor 0–10. São limites de entrada, não interpretação clínica; a avaliação cabe ao profissional.</p>
         </div>}
 
         {step === 3 && <div className="triage-fields priority-step">
