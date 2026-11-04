@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "oxlint",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -16,7 +15,6 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^6.1.2",
     "@tailwindcss/vite": "^4.1.17",
-    "oxlint": "^1.89.0",
     "tailwindcss": "^4.1.17",
     "vite": "^8.3.5"
   }
