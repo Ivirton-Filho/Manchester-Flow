@@ -314,4 +314,69 @@
 .alert-clear .alert-copy strong{color:#3e7650}
 .alert-clear .alert-copy p{color:#718e79}
 .alert-clear button{color:#679378}
-@media(max-width:640px){.queue-sync-tag{font-size:0;width:36px;height:36px;justify-content:center;padding:0;flex:none}.queue-sync-tag svg{width:17px;height:17px}}
+@media(max-width:640px){.queue-sync-tag{font-size:0!important;width:36px;height:36px;justify-content:center;padding:0;flex:none}.queue-sync-tag svg{width:17px;height:17px}}
+
+/* Legibilidade: manter textos operacionais e controles em tamanho confortável. */
+:where(.eyebrow,.brand-copy small,.unit-copy small,.nav-label,.nav-count,.soon-label,
+.sidebar-foot,.online-indicator,.breadcrumbs,.today-chip,.user-info,.primary-button,
+.metric-context,.trend,.metric-caption,.metric-bottom,.metric-progress,.panel-heading p,
+.live-tag,.text-link,.search-box input,.search-box kbd,.queue-summary,.queue-table th,
+.position-number,.patient-cell strong,.patient-cell small,.priority,.priority-symbol,
+.wait-time,.status,.queue-footer,.queue-footer button,.donut span,.distribution-note,
+.legend-name,.legend-count,.legend-percent,.alert-copy,.shift-heading,.shift-tag,
+.shift-stats span,.disclaimer,.queue-page-heading p,.queue-refresh-button,
+.queue-secondary-button,.queue-stat-card small,.queue-stat-caption,.next-patient-copy small,
+.next-patient-copy span,.next-wait small,.next-patient-card>.primary-button,
+.queue-list-heading h2 span,.queue-list-heading p,.queue-live,.queue-select-label,
+.queue-search input,.queue-select-label select,.clear-queue-filters,.queue-page-table th,
+.queue-page-table .patient-cell strong,.queue-page-table .patient-cell small,
+.queue-page-table .priority,.queue-page-table .wait-time,.queue-page-table .status,
+.queue-open-button,.queue-list-footer,.queue-empty p,.queue-empty button,
+.queue-modal-header .eyebrow,.queue-modal-header p,.queue-modal-facts small,
+.queue-modal-facts>div>strong,.queue-modal-note,.queue-modal-actions button,
+.triage-arrival-chip,.stepper-number,.stepper-label,.triage-error-summary strong,
+.triage-error-summary span,.triage-form-heading>span,.triage-form-heading p,
+.triage-field,.triage-field-label,.triage-field-label small,.triage-field input,
+.triage-field textarea,.field-unit,.field-error,.auto-time-field small,.automatic-tag,
+.symptom-fieldset legend,.priority-fieldset legend,.symptom-fieldset>p,
+.priority-fieldset>p,.symptom-chip,.vitals-note,.triage-form-actions button,
+.triage-cancel-button,.triage-assist-card h3,.triage-assist-card p,
+.triage-progress-card>small,.progress-step>span,.progress-step strong,
+.priority-choice-copy strong,.priority-choice-copy strong small,.priority-choice-copy>span,
+.triage-review-heading strong,.triage-review-grid small,.triage-review-grid strong,
+.triage-reference-note,.history-total small,.history-readonly-tag,.history-panel-heading p,
+.history-search input,.history-filter-label,.history-filter-label input,
+.history-filter-label select,.history-clear-button,.history-table th,
+.history-table .patient-cell strong,.history-table .patient-cell small,.history-date,
+.history-time,.history-reason,.history-table .priority,.history-table .wait-time,
+.history-pagination,.history-pagination button,.history-complete-badge,
+.history-record-grid small,.history-record-grid strong,.history-vitals h3,
+.history-timeline h3,.history-vitals small,.history-vitals strong,.history-timeline strong,
+.history-timeline small,.history-readonly-footer,.history-mobile-meta,
+.history-mobile-open,.completion-confirmation strong,.completion-confirmation span,
+.completion-confirmation button,.queue-sync-tag,.mobile-nav>button,.mobile-add>small,
+.toast){font-size:12px !important}
+
+/* Let longer labels wrap instead of shrinking to fit narrow cards. */
+.metric-context,.metric-bottom,.metric-progress>span,.queue-page-table th,
+.queue-list-footer,.queue-footer,.queue-footer button,.queue-select-label,
+.queue-stat-card small,.next-patient-copy small,.next-wait small,.queue-live,
+.history-total small,.history-readonly-tag,.triage-form-heading>span,
+.triage-progress-card>small,.triage-review-grid small{letter-spacing:.02em}
+.queue-stat-card small,.next-patient-copy small,.next-wait small,.metric-context,
+.queue-live,.history-total small,.history-readonly-tag,.triage-form-heading>span,
+.triage-progress-card>small,.triage-review-grid small{white-space:normal}
+.patient-cell strong,.patient-cell small,.queue-page-table .patient-cell strong,
+.queue-page-table .patient-cell small{white-space:normal}
+.queue-list-footer,.queue-footer{height:auto;min-height:40px;gap:8px;flex-wrap:wrap;padding-top:8px;padding-bottom:8px}
+.metric-bottom{align-items:flex-start}
+
+@media(max-width:640px){
+  .metric-grid{grid-template-columns:1fr}
+  .metric-card{min-height:0}
+  .queue-stat-card{min-height:88px}
+  .queue-stat-card small{white-space:normal}
+  .queue-mobile-facts,.history-mobile-meta{flex-wrap:wrap}
+  .queue-mobile-arrival{margin-left:0}
+  .mobile-nav>button{min-width:58px}
+}
