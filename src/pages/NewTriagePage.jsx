@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Icon from '../components/Icon.jsx'
 import { formatClock } from '../utils/patientTime.js'
+import { playUiSound } from '../utils/uiSound.js'
 
 const steps = ['Dados iniciais', 'Sintomas', 'Sinais vitais', 'Prioridade']
 const symptomOptions = ['Dor', 'Febre', 'Tosse', 'Falta de ar', 'Tontura', 'Náusea', 'Mal-estar', 'Outro']
@@ -77,6 +78,7 @@ export default function NewTriagePage({ onSave, onNavigate }) {
 
   function continueStep() {
     if (!validateStep()) return
+    playUiSound('step')
     setStep(current => Math.min(current + 1, steps.length - 1))
     setErrors({})
     setShowSummary(false)
@@ -84,6 +86,7 @@ export default function NewTriagePage({ onSave, onNavigate }) {
   }
 
   function goBack() {
+    playUiSound('step')
     setStep(current => Math.max(current - 1, 0))
     setErrors({})
     setShowSummary(false)
@@ -92,6 +95,7 @@ export default function NewTriagePage({ onSave, onNavigate }) {
 
   function confirmTriage() {
     if (!validateStep()) return
+    playUiSound('complete')
     onSave({
       id: `p-${Date.now()}`,
       name: form.name.trim(),

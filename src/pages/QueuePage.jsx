@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import Icon from '../components/Icon.jsx'
 import { elapsedWaitMinutes, formatWaitTime } from '../utils/patientTime.js'
+import { playUiSound } from '../utils/uiSound.js'
 
 const priorityOrder = { Vermelho: 0, Laranja: 1, Amarelo: 2, Verde: 3, Azul: 4 }
 const priorities = ['Vermelho', 'Laranja', 'Amarelo', 'Verde', 'Azul']
@@ -58,12 +59,14 @@ export default function QueuePage({ patients, now = Date.now(), onNavigate, onUp
   }
 
   function startPatient(patient) {
+    playUiSound('start')
     onUpdatePatient(patient.id, 'Em atendimento')
     setSelectedPatient(null)
     onNotice(`${patient.name} atualizado para “Em atendimento”.`)
   }
 
   function completePatient(patient) {
+    playUiSound('complete')
     onCompletePatient(patient.id)
     setSelectedPatient(null)
     onNotice(`${patient.name}: atendimento concluído e enviado ao Histórico.`)
