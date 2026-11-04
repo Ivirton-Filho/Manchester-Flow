@@ -18,6 +18,9 @@ export default function Icon({ name, size = 20, strokeWidth = 1.8 }) {
     leaf: <><path d="M20 4c-7 0-13 2-15 8-1 3 1 6 4 6 6 0 9-7 11-14Z"/><path d="M4 21c2-5 6-8 11-11"/></>,
     heart: <path d="M20.8 8.7c0 4.5-8.8 10.3-8.8 10.3S3.2 13.2 3.2 8.7A4.2 4.2 0 0 1 11 6.4l1 1 1-1a4.2 4.2 0 0 1 7.8 2.3Z"/>,
     logout: <><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></>,
+    alert: <><path d="M10.3 3.9 2.6 17.2A2 2 0 0 0 4.3 20h15.4a2 2 0 0 0 1.7-2.8L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></>,
+    info: <><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></>,
+    'arrow-left': <><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></>,
   }
 
   return <svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">{paths[name] || paths.grid}</svg>

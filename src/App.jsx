@@ -5,6 +5,7 @@ import MobileNav from './components/MobileNav.jsx'
 import Toast from './components/Toast.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import QueuePage from './pages/QueuePage.jsx'
+import NewTriagePage from './pages/NewTriagePage.jsx'
 import { demoPatients } from './data/demoPatients.js'
 
 export default function App() {
@@ -19,11 +20,17 @@ export default function App() {
 
   function navigate(label) {
     setActiveItem(label)
-    if (!['Painel', 'Fila de atendimento'].includes(label)) showNotice(`${label} será a próxima etapa do protótipo.`)
+    if (!['Painel', 'Fila de atendimento', 'Nova triagem'].includes(label)) showNotice(`${label} será a próxima etapa do protótipo.`)
   }
 
   function updatePatientStatus(id, status) {
     setPatients(current => current.map(patient => patient.id === id ? { ...patient, status } : patient))
+  }
+
+  function saveTriage(patient) {
+    setPatients(current => [patient, ...current])
+    setActiveItem('Fila de atendimento')
+    showNotice('Triagem salva. Paciente adicionado à fila.')
   }
 
   return <div className="app-shell">
@@ -32,7 +39,9 @@ export default function App() {
       <Topbar pageName={activeItem === 'Fila de atendimento' ? 'Fila' : activeItem} onNotice={() => showNotice('Você está em dia. Nenhum aviso novo.')}/>
       {activeItem === 'Fila de atendimento'
         ? <QueuePage patients={patients} onNavigate={navigate} onUpdatePatient={updatePatientStatus} onNotice={showNotice}/>
-        : <DashboardPage onNavigate={navigate} patients={patients}/>}
+        : activeItem === 'Nova triagem'
+          ? <NewTriagePage onNavigate={navigate} onSave={saveTriage}/>
+          : <DashboardPage onNavigate={navigate} patients={patients}/>}
     </div>
     <MobileNav activeItem={activeItem} onNavigate={navigate} onMore={() => showNotice('Menu de navegação completo nas próximas etapas.')}/>
     <Toast message={notice}/>
