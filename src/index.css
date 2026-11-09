@@ -316,6 +316,107 @@
 .alert-clear button{color:#679378}
 @media(max-width:640px){.queue-sync-tag{font-size:0!important;width:36px;height:36px;justify-content:center;padding:0;flex:none}.queue-sync-tag svg{width:17px;height:17px}}
 
+/* Alternador de tema: detalhe azul noturno inspirado no ambiente clínico. */
+.theme-toggle{border:1px solid #e3ebf2;background:#f7faff;color:#345a7c;transition:background .2s,border-color .2s,color .2s,transform .2s}
+.theme-toggle:hover{background:#eaf4ff;border-color:#c9def1;color:#0757aa;transform:rotate(-8deg)}
+.theme-toggle:active{transform:scale(.94)}
+
+:root[data-theme="dark"]{color-scheme:dark;background:#101c2b;color:#e4edf7;--ink:#e4edf7;--muted:#a3b4c7;--line:#2c3d51;--page:#101c2b;--panel:#19283a}
+:root[data-theme="dark"] body{background:#101c2b;color:#e4edf7}
+:root[data-theme="dark"] .main-column,:root[data-theme="dark"] .dashboard{background:#101c2b}
+:root[data-theme="dark"] .sidebar{background:#102944;border-color:#263d55;color:#e2edf8}
+:root[data-theme="dark"] .topbar,:root[data-theme="dark"] .metric-card,:root[data-theme="dark"] .panel,
+:root[data-theme="dark"] .queue-stat-card,:root[data-theme="dark"] .next-patient-card,
+:root[data-theme="dark"] .queue-list-panel,:root[data-theme="dark"] .triage-form-card,
+:root[data-theme="dark"] .triage-assist-card,:root[data-theme="dark"] .triage-progress-card,
+:root[data-theme="dark"] .history-panel,:root[data-theme="dark"] .history-total,
+:root[data-theme="dark"] .queue-modal,:root[data-theme="dark"] .history-mobile-card,
+:root[data-theme="dark"] .queue-mobile-card{background:#19283a!important;border-color:#2c3d51!important;color:#e4edf7}
+:root[data-theme="dark"] .mobile-nav{background:#172638;border-color:#2c3d51;box-shadow:0 -4px 15px #0003}
+:root[data-theme="dark"] .unit-select,:root[data-theme="dark"] .sidebar-bottom{border-color:#29435e}
+:root[data-theme="dark"] .unit-select,:root[data-theme="dark"] .search-box,
+:root[data-theme="dark"] .queue-search,:root[data-theme="dark"] .queue-select-label select,
+:root[data-theme="dark"] .history-search,:root[data-theme="dark"] .history-filter-label input,
+:root[data-theme="dark"] .history-filter-label select,:root[data-theme="dark"] .triage-field input,
+:root[data-theme="dark"] .triage-field textarea,:root[data-theme="dark"] .period-select,
+:root[data-theme="dark"] .queue-open-button,:root[data-theme="dark"] .queue-secondary-button,
+:root[data-theme="dark"] .symptom-chip,:root[data-theme="dark"] .priority-choice,
+:root[data-theme="dark"] .queue-modal-close{background:#142337!important;border-color:#344960!important;color:#dce8f5!important}
+:root[data-theme="dark"] .metric-card,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .queue-list-panel,
+:root[data-theme="dark"] .history-panel,:root[data-theme="dark"] .queue-stat-card{box-shadow:0 4px 15px #0002}
+:root[data-theme="dark"] .queue-list-heading,:root[data-theme="dark"] .queue-filters,
+:root[data-theme="dark"] .history-panel-heading,:root[data-theme="dark"] .history-filters,
+:root[data-theme="dark"] .queue-table td,:root[data-theme="dark"] .queue-page-table td,
+:root[data-theme="dark"] .history-table td{border-color:#2b3c50}
+:root[data-theme="dark"] .queue-table tbody tr:hover,:root[data-theme="dark"] .queue-page-table tbody tr:hover,
+:root[data-theme="dark"] .history-table tbody tr:hover{background:#20334a}
+:root[data-theme="dark"] .metric-card,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .queue-stat-card,
+:root[data-theme="dark"] .next-patient-card,:root[data-theme="dark"] .queue-list-panel,
+:root[data-theme="dark"] .triage-form-card,:root[data-theme="dark"] .triage-assist-card,
+:root[data-theme="dark"] .triage-progress-card,:root[data-theme="dark"] .history-panel,
+:root[data-theme="dark"] .history-total,:root[data-theme="dark"] .queue-modal{border-color:#2c3d51}
+:root[data-theme="dark"] :is(.breadcrumbs,.today-chip,.user-info span,.welcome-row p,.queue-page-heading p,
+.history-heading p,.triage-page-heading p,.metric-caption,.metric-bottom,.metric-progress>span,
+.panel-heading p,.queue-list-heading p,.patient-cell small,.queue-page-table .patient-cell small,
+.history-table .patient-cell small,.queue-list-footer,.queue-footer,.disclaimer,.legend-name,
+.legend-percent,.distribution-note small,.shift-heading small,.shift-stats span,
+.queue-stat-caption,.next-patient-copy span,.queue-select-label,.history-filter-label,
+.queue-modal-header p,.queue-modal-note,.triage-field-label,.triage-form-heading p,
+.symptom-fieldset>p,.priority-fieldset>p,.vitals-note,.triage-assist-card p,
+.priority-choice-copy>span,.triage-reference-note,.history-time,.history-reason,
+.history-pagination,.history-record-grid small,.history-vitals small,.history-timeline small,
+.history-readonly-footer,.history-mobile-meta){color:#a3b4c7!important}
+:root[data-theme="dark"] :is(.welcome-row h1,.queue-page-heading h1,.history-heading h1,
+.triage-page-heading h1,.panel-heading h2,.queue-list-heading h2,.history-panel-heading h2,
+.metric-number-row>strong,.donut strong,.shift-stats strong,.next-patient-copy strong,
+.queue-stat-card strong,.patient-cell strong,.queue-page-table .patient-cell strong,
+.history-table .patient-cell strong,.triage-form-heading h2,.triage-form-heading h3,
+.triage-field-label,.symptom-fieldset legend,.priority-fieldset legend,
+.priority-choice-copy strong,.triage-review-grid strong,.history-record-grid strong,
+.history-vitals strong,.history-timeline strong,.history-panel-heading h2){color:#e4edf7!important}
+:root[data-theme="dark"] .nav-item{color:#bfd0e2}
+:root[data-theme="dark"] .nav-item:hover,:root[data-theme="dark"] .nav-item.active{background:#193b5e;color:#d9ebff}
+:root[data-theme="dark"] .theme-toggle{background:#213950;border-color:#3b526c;color:#f4c96b}
+:root[data-theme="dark"] .theme-toggle:hover{background:#294866;border-color:#52708d;color:#ffe08c}
+:root[data-theme="dark"] .metric-bottom,:root[data-theme="dark"] .queue-toolbar,
+:root[data-theme="dark"] .queue-footer,:root[data-theme="dark"] .queue-list-footer,
+:root[data-theme="dark"] .history-pagination{border-color:#2b3c50}
+:root[data-theme="dark"] .triage-stepper,:root[data-theme="dark"] .triage-review,
+:root[data-theme="dark"] .auto-time-field,:root[data-theme="dark"] .queue-modal-facts,
+:root[data-theme="dark"] .history-record-grid,:root[data-theme="dark"] .history-vitals>div>span,
+:root[data-theme="dark"] .history-readonly-footer,:root[data-theme="dark"] .triage-reference-note,
+:root[data-theme="dark"] .completion-confirmation,:root[data-theme="dark"] .triage-error-summary{background:#142337;border-color:#2b3c50;color:#c4d3e3}
+:root[data-theme="dark"] .triage-stepper{background:#19283a}
+:root[data-theme="dark"] .triage-reference-note{color:#e2cc91}
+:root[data-theme="dark"] .completion-confirmation{background:#342b1d;border-color:#5a4828}
+:root[data-theme="dark"] .completion-confirmation strong{color:#f2d18d}
+:root[data-theme="dark"] .completion-confirmation span{color:#cfb982}
+:root[data-theme="dark"] .triage-error-summary{background:#382426;border-color:#63383b;color:#f0c3c2}
+:root[data-theme="dark"] .stepper-number,:root[data-theme="dark"] .progress-step>span{background:#142337;border-color:#3a5068;color:#c4d3e3}
+:root[data-theme="dark"] .priority-choice.selected{background:#1b3854;border-color:#4b83b6}
+:root[data-theme="dark"] .queue-select-label select,:root[data-theme="dark"] .history-filter-label select,
+:root[data-theme="dark"] .history-filter-label input,:root[data-theme="dark"] .triage-field input,
+:root[data-theme="dark"] .triage-field textarea{color:#e4edf7}
+:root[data-theme="dark"] input::placeholder,:root[data-theme="dark"] textarea::placeholder{color:#8296ac}
+:root[data-theme="dark"] .alert-card{background:#342b1d;border-color:#5a4828}
+:root[data-theme="dark"] .alert-copy strong{color:#f2d18d}
+:root[data-theme="dark"] .alert-copy p{color:#cfb982}
+:root[data-theme="dark"] .alert-clear{background:#1c332c;border-color:#2d5640}
+:root[data-theme="dark"] .alert-clear .alert-copy strong{color:#a8d7b5}
+:root[data-theme="dark"] .alert-clear .alert-copy p{color:#9ec0a8}
+:root[data-theme="dark"] .priority-vermelho{background:#4a292b;color:#ffaaa4}
+:root[data-theme="dark"] .priority-laranja{background:#493322;color:#f2bd84}
+:root[data-theme="dark"] .priority-amarelo{background:#484022;color:#eed77e}
+:root[data-theme="dark"] .priority-verde{background:#243d30;color:#a7d9b0}
+:root[data-theme="dark"] .priority-azul{background:#25384a;color:#a8c9e8}
+:root[data-theme="dark"] .live-tag,:root[data-theme="dark"] .queue-live,:root[data-theme="dark"] .shift-tag,
+:root[data-theme="dark"] .history-complete-badge{background:#203b2d;color:#a8d8b5}
+:root[data-theme="dark"] .nav-count{background:#203b5b;border-color:#345a80;color:#c8e1fa}
+:root[data-theme="dark"] .queue-modal-backdrop{background:#06101dc9}
+:root[data-theme="dark"] .toast{background:#dceaff;color:#173858}
+
+@media(prefers-reduced-motion:reduce){.theme-toggle{transition:none}}
+
 /* Legibilidade: manter textos operacionais e controles em tamanho confortável. */
 :where(.eyebrow,.brand-copy small,.unit-copy small,.nav-label,.nav-count,.soon-label,
 .sidebar-foot,.online-indicator,.breadcrumbs,.today-chip,.user-info,.primary-button,

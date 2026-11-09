@@ -17,6 +17,10 @@ export default function App() {
   const [patients, setPatients] = useState(demoPatients)
   const [historyRecords, setHistoryRecords] = useState(demoHistory)
   const [now, setNow] = useState(() => Date.now())
+  const [theme, setTheme] = useState(() => {
+    try { return window.localStorage.getItem('abacaxi-theme') === 'dark' ? 'dark' : 'light' }
+    catch { return 'light' }
+  })
   const activeQueueCount = patients.filter(patient => ['Aguardando', 'Em atendimento'].includes(patient.status)).length
   const longWaitCount = patients.filter(patient => patient.status === 'Aguardando' && elapsedWaitMinutes(patient, now) > 30).length
 
@@ -24,6 +28,15 @@ export default function App() {
     const timer = window.setInterval(() => setNow(Date.now()), 30_000)
     return () => window.clearInterval(timer)
   }, [])
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    try { window.localStorage.setItem('abacaxi-theme', theme) } catch { /* tema permanece ativo nesta sessão */ }
+  }, [theme])
+
+  function toggleTheme() {
+    setTheme(current => current === 'light' ? 'dark' : 'light')
+  }
 
   function showNotice(message) {
     setNotice(message)
@@ -87,7 +100,7 @@ export default function App() {
   return <div className="app-shell">
     <Sidebar activeItem={activeItem} onNavigate={navigate} queueCount={activeQueueCount}/>
     <div className="main-column">
-      <Topbar pageName={activeItem === 'Fila de atendimento' ? 'Fila' : activeItem} notificationCount={longWaitCount} onNotice={() => showNotice(longWaitCount ? `${longWaitCount} pacientes aguardam há mais de 30 minutos.` : 'Nenhum paciente aguarda há mais de 30 minutos.')}/>
+      <Topbar pageName={activeItem === 'Fila de atendimento' ? 'Fila' : activeItem} notificationCount={longWaitCount} theme={theme} onToggleTheme={toggleTheme} onNotice={() => showNotice(longWaitCount ? `${longWaitCount} pacientes aguardam há mais de 30 minutos.` : 'Nenhum paciente aguarda há mais de 30 minutos.')}/>
       {activeItem === 'Fila de atendimento'
         ? <QueuePage patients={patients} now={now} onNavigate={navigate} onUpdatePatient={updatePatientStatus} onCompletePatient={completePatient} onNotice={showNotice}/>
         : activeItem === 'Nova triagem'
