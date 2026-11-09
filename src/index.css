@@ -596,3 +596,24 @@ button:not(:disabled):active,.priority-choice:active,.symptom-chip:active{transf
 @media(max-width:1200px){.sidebar-is-collapsed .sidebar{width:76px}.sidebar-is-collapsed .main-column{margin-left:76px}}
 @media(max-width:640px){.sidebar-is-collapsed .sidebar{display:none}.sidebar-is-collapsed .main-column{margin-left:0}}
 @media(prefers-reduced-motion:reduce){.sidebar,.main-column{transition:none}}
+
+/* Abertura dos detalhes e da confirmação de conclusão. */
+@keyframes detail-backdrop-enter{from{opacity:0;backdrop-filter:blur(0)}to{opacity:1;backdrop-filter:blur(4px)}}
+@keyframes detail-panel-enter{0%{opacity:0;transform:translateY(44px) scale(.9)}68%{opacity:1;transform:translateY(-4px) scale(1.015)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes detail-confirm-enter{0%{opacity:0;transform:translateY(26px) scale(.96)}75%{opacity:1;transform:translateY(-2px) scale(1.008)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes detail-backdrop-exit{from{opacity:1;backdrop-filter:blur(4px)}to{opacity:0;backdrop-filter:blur(0)}}
+@keyframes detail-panel-exit{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(22px) scale(.96)}}
+.queue-modal-backdrop{animation:detail-backdrop-enter .34s ease both}
+.queue-modal{animation:detail-panel-enter .72s cubic-bezier(.2,.9,.25,1) both}
+.completion-confirmation{animation:detail-confirm-enter .58s cubic-bezier(.2,.9,.25,1) .12s both;transform-origin:top center}
+.queue-modal-backdrop.is-closing{animation:detail-backdrop-exit .3s ease both}
+.queue-modal.is-closing{animation:detail-panel-exit .36s cubic-bezier(.4,0,.8,.2) both}
+
+/* Mantém esse preview animado mesmo quando o sistema pede movimento reduzido. */
+@media(prefers-reduced-motion:reduce){
+  .queue-modal-backdrop{animation:detail-backdrop-enter .34s ease both!important}
+  .queue-modal{animation:detail-panel-enter .72s cubic-bezier(.2,.9,.25,1) both!important}
+  .completion-confirmation{animation:detail-confirm-enter .58s cubic-bezier(.2,.9,.25,1) .12s both!important}
+  .queue-modal-backdrop.is-closing{animation:detail-backdrop-exit .3s ease both!important}
+  .queue-modal.is-closing{animation:detail-panel-exit .36s cubic-bezier(.4,0,.8,.2) both!important}
+}

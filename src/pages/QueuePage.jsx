@@ -19,10 +19,10 @@ function StatusBadge({ value }) {
   return <span className={`status status-${state}`}><Icon name={icon} size={14}/>{value}</span>
 }
 
-function PatientDetails({ patient, now, onClose, onStart, onRequestComplete, onConfirmComplete, onCancelCompletion, confirmingCompletion }) {
+function PatientDetails({ patient, now, onClose, onCloseComplete, onStart, onRequestComplete, onConfirmComplete, onCancelCompletion, confirmingCompletion, isClosing }) {
   if (!patient) return null
-  return <div className="queue-modal-backdrop" onMouseDown={onClose}>
-    <section className="queue-modal" role="dialog" aria-modal="true" aria-labelledby="patient-modal-title" onMouseDown={event => event.stopPropagation()}>
+  return <div className={`queue-modal-backdrop ${isClosing ? 'is-closing' : ''}`} onMouseDown={onClose}>
+    <section className={`queue-modal ${isClosing ? 'is-closing' : ''}`} role="dialog" aria-modal="true" aria-labelledby="patient-modal-title" onMouseDown={event => event.stopPropagation()} onAnimationEnd={event => { if (event.target === event.currentTarget && event.animationName === 'detail-panel-exit') onCloseComplete() }}>
       <div className="queue-modal-header"><div><span className="eyebrow">REGISTRO DE TRIAGEM</span><h2 id="patient-modal-title">{patient.name}</h2><p>{patient.reason} <span>·</span> chegada às {patient.time}</p></div><button className="queue-modal-close" onClick={onClose} aria-label="Fechar"><span aria-hidden="true">×</span></button></div>
       <div className="queue-modal-facts"><div><small>PRIORIDADE</small><PriorityBadge value={patient.priority}/></div><div><small>TEMPO DE ESPERA</small><strong>{formatWaitTime(patient, now)}</strong></div><div><small>STATUS</small><StatusBadge value={patient.status}/></div></div>
       <p className="queue-modal-note">A prioridade exibida foi definida por um profissional de saúde. O sistema apoia a organização da fila e não realiza diagnóstico.</p>
@@ -38,6 +38,7 @@ export default function QueuePage({ patients, now = Date.now(), onNavigate, onUp
   const [statusFilter, setStatusFilter] = useState('Todos os status')
   const [selectedPatient, setSelectedPatient] = useState(null)
   const [confirmingCompletion, setConfirmingCompletion] = useState(false)
+  const [isClosingDetails, setIsClosingDetails] = useState(false)
 
   const activePatients = useMemo(() => patients.filter(patient => ['Aguardando', 'Em atendimento'].includes(patient.status)), [patients])
   const orderedPatients = useMemo(() => [...activePatients].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority] || Date.parse(a.arrivedAt || '') - Date.parse(b.arrivedAt || '') || a.time.localeCompare(b.time)), [activePatients])
@@ -61,25 +62,32 @@ export default function QueuePage({ patients, now = Date.now(), onNavigate, onUp
   function startPatient(patient) {
     playUiSound('start')
     onUpdatePatient(patient.id, 'Em atendimento')
-    setSelectedPatient(null)
+    closeDetails()
     onNotice(`${patient.name} atualizado para “Em atendimento”.`)
   }
 
   function completePatient(patient) {
     playUiSound('complete')
     onCompletePatient(patient.id)
-    setSelectedPatient(null)
+    closeDetails()
     onNotice(`${patient.name}: atendimento concluído e enviado ao Histórico.`)
   }
 
   function openDetails(patient) {
+    setIsClosingDetails(false)
     setConfirmingCompletion(false)
     setSelectedPatient(patient)
   }
 
   function closeDetails() {
+    if (!selectedPatient || isClosingDetails) return
     setConfirmingCompletion(false)
+    setIsClosingDetails(true)
+  }
+
+  function finishClosingDetails() {
     setSelectedPatient(null)
+    setIsClosingDetails(false)
   }
 
   return <main className="dashboard queue-page">
@@ -129,6 +137,6 @@ export default function QueuePage({ patients, now = Date.now(), onNavigate, onUp
       <div className="queue-list-footer"><span>Exibindo {visiblePatients.length} de {activePatients.length} pacientes</span><span>Contagem compartilhada com o Painel</span></div>
     </section>
     <footer className="disclaimer"><span className="disclaimer-mark">i</span><span>Sistema de apoio à organização da triagem. <strong>Não realiza diagnóstico nem substitui a decisão do profissional de saúde.</strong> Dados fictícios.</span><span className="footer-made">Feito com <b>♥</b> pela Abacaxi Tech</span></footer>
-    <PatientDetails patient={selectedPatient} now={now} onClose={closeDetails} onStart={startPatient} onRequestComplete={() => setConfirmingCompletion(true)} onConfirmComplete={completePatient} onCancelCompletion={() => setConfirmingCompletion(false)} confirmingCompletion={confirmingCompletion}/>
+    <PatientDetails patient={selectedPatient} now={now} onClose={closeDetails} onCloseComplete={finishClosingDetails} onStart={startPatient} onRequestComplete={() => setConfirmingCompletion(true)} onConfirmComplete={completePatient} onCancelCompletion={() => setConfirmingCompletion(false)} confirmingCompletion={confirmingCompletion} isClosing={isClosingDetails}/>
   </main>
 }
