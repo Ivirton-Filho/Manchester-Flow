@@ -21,6 +21,10 @@ export default function App() {
     try { return window.localStorage.getItem('abacaxi-theme') === 'dark' ? 'dark' : 'light' }
     catch { return 'light' }
   })
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try { return window.localStorage.getItem('abacaxi-sidebar-collapsed') === 'true' }
+    catch { return false }
+  })
   const activeQueueCount = patients.filter(patient => ['Aguardando', 'Em atendimento'].includes(patient.status)).length
   const longWaitCount = patients.filter(patient => patient.status === 'Aguardando' && elapsedWaitMinutes(patient, now) > 30).length
 
@@ -33,6 +37,11 @@ export default function App() {
     document.documentElement.dataset.theme = theme
     try { window.localStorage.setItem('abacaxi-theme', theme) } catch { /* tema permanece ativo nesta sessão */ }
   }, [theme])
+
+  useEffect(() => {
+    try { window.localStorage.setItem('abacaxi-sidebar-collapsed', String(sidebarCollapsed)) }
+    catch { /* estado permanece ativo nesta sessão */ }
+  }, [sidebarCollapsed])
 
   function toggleTheme() {
     setTheme(current => current === 'light' ? 'dark' : 'light')
@@ -97,8 +106,8 @@ export default function App() {
     showNotice('Triagem salva. Paciente adicionado à fila.')
   }
 
-  return <div className="app-shell">
-    <Sidebar activeItem={activeItem} onNavigate={navigate} queueCount={activeQueueCount}/>
+  return <div className={`app-shell ${sidebarCollapsed ? 'sidebar-is-collapsed' : ''}`}>
+    <Sidebar activeItem={activeItem} onNavigate={navigate} queueCount={activeQueueCount} collapsed={sidebarCollapsed} onToggleCollapsed={() => setSidebarCollapsed(value => !value)}/>
     <div className="main-column">
       <Topbar pageName={activeItem === 'Fila de atendimento' ? 'Fila' : activeItem} notificationCount={longWaitCount} theme={theme} onToggleTheme={toggleTheme} onNotice={() => showNotice(longWaitCount ? `${longWaitCount} pacientes aguardam há mais de 30 minutos.` : 'Nenhum paciente aguarda há mais de 30 minutos.')}/>
       {activeItem === 'Fila de atendimento'

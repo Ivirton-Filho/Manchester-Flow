@@ -567,3 +567,24 @@ button:not(:disabled):active,.priority-choice:active,.symptom-chip:active{transf
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
 }
+
+/* Navegação lateral expansível. */
+.sidebar{transition:width .24s var(--motion-ease),padding .24s var(--motion-ease)}
+.main-column{transition:margin-left .24s var(--motion-ease)}
+.sidebar-toggle{position:absolute;top:50%;right:-14px;z-index:8;width:29px;height:29px;display:grid;place-items:center;border:1px solid #cfe0ef;border-radius:50%;background:#fff;color:#315c82;box-shadow:0 3px 9px #102b461a;transform:translateY(-50%)}
+.sidebar-toggle:hover{background:#eaf4ff;color:#0757aa;transform:translateY(-50%) scale(1.06)}
+.sidebar-is-collapsed .sidebar{width:76px;padding-left:12px;padding-right:12px}
+.sidebar-is-collapsed .main-column{margin-left:76px}
+.sidebar-is-collapsed .brand{justify-content:center;padding:0;margin-left:0;margin-right:0}
+.sidebar-is-collapsed .brand-copy,.sidebar-is-collapsed .nav-item-label,
+.sidebar-is-collapsed .nav-count,.sidebar-is-collapsed .soon-label,
+.sidebar-is-collapsed .support-card>div{display:none}
+.sidebar-is-collapsed .side-nav{align-items:center}
+.sidebar-is-collapsed .nav-item{width:48px;justify-content:center;gap:0;padding:0}
+.sidebar-is-collapsed .nav-item.active:before{left:-12px}
+.sidebar-is-collapsed .support-card{justify-content:center;min-height:48px;padding:8px;margin:0 0 9px}
+:root[data-theme="dark"] .sidebar-toggle{background:#203b55;border-color:#49627c;color:#e5effa;box-shadow:0 3px 9px #0004}
+:root[data-theme="dark"] .sidebar-toggle:hover{background:#2b4b69;color:#fff}
+@media(max-width:1200px){.sidebar-is-collapsed .sidebar{width:76px}.sidebar-is-collapsed .main-column{margin-left:76px}}
+@media(max-width:640px){.sidebar-is-collapsed .sidebar{display:none}.sidebar-is-collapsed .main-column{margin-left:0}}
+@media(prefers-reduced-motion:reduce){.sidebar,.main-column{transition:none}}
