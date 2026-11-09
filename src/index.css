@@ -553,7 +553,15 @@ button:not(:disabled):active,.priority-choice:active,.symptom-chip:active{transf
 .history-mobile-card:nth-child(4),.triage-fields>*:nth-child(4){animation-delay:.2s}
 .queue-page-table tbody tr:nth-child(5),.history-table tbody tr:nth-child(5),.queue-mobile-card:nth-child(5),
 .history-mobile-card:nth-child(5),.triage-fields>*:nth-child(5){animation-delay:.25s}
-.donut,.history-total,.triage-arrival-chip{animation:motion-pop .4s var(--motion-snap) both}
+.history-total,.triage-arrival-chip{animation:motion-pop .4s var(--motion-snap) both}
+
+/* Gráficos do painel: revelam os valores na primeira abertura da tela. */
+@keyframes chart-fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes chart-reveal{from{transform:scale(.72);opacity:.35}to{transform:scale(1);opacity:1}}
+.dashboard .capacity span,.dashboard .progress-line span,.dashboard .shift-progress span{
+  transform:scaleX(0);transform-origin:left center;animation:chart-fill .7s var(--motion-snap) .28s both;
+}
+.dashboard .donut{animation:chart-reveal .65s var(--motion-snap) .34s both}
 
 /* Seleções, estados sincronizados e retornos de validação. */
 .symptom-chip.selected,.priority-choice.selected,.progress-step.current{animation:motion-select .24s var(--motion-snap) both}
